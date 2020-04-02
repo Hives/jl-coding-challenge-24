@@ -1,10 +1,18 @@
 fun decideWinner(river: List<Card>, players: List<Player>): List<Player> {
+
+    val playersWithPairs = players.filter { player -> player.hand.isPair() }
+    if (playersWithPairs.count() > 0) {
+        return playersWithPairs
+    }
+
     val highestValue = players.flatMap { it.hand }.maxBy { it.type.value }!!.type.value // !! == :(
     return players.filter { player ->
         val values = player.hand.map { card -> card.type.value }
         values.contains(highestValue)
     }
 }
+
+fun List<Card>.isPair() = this[0].type.value == this[1].type.value
 
 enum class Suit(name: String) {
     HEARTS("Hearts"),
