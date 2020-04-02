@@ -1,4 +1,10 @@
-fun decideWinner(river: List<Card>, players: List<Player>): List<Player> = players
+fun decideWinner(river: List<Card>, players: List<Player>): List<Player> {
+    val highestValue = players.flatMap { it.hand }.maxBy { it.type.value }!!.type.value // !! == :(
+    return players.filter { player ->
+        val values = player.hand.map { card -> card.type.value }
+        values.contains(highestValue)
+    }
+}
 
 enum class Suit(name: String) {
     HEARTS("Hearts"),
@@ -7,22 +13,24 @@ enum class Suit(name: String) {
     SPADES("Spades")
 }
 
-enum class CardType(name: String, value: Int) {
-    TWO("Two", 2),
-    THREE("Three", 3),
-    FOUR("Four", 4),
-    FIVE("Five", 5),
-    SIX("Six", 6),
-    SEVEN("Seven", 7),
-    EIGHT("Eight", 8),
-    NINE("Nine", 9),
-    TEN("Ten", 10),
-    JACK("Jack", 11),
-    QUEEN("Queen", 12),
-    KING("King", 13),
-    ACE("Ace", 14)
+sealed class CardType(val name: String, val value: Int) {
+    object TWO: CardType("Two", 2)
+    object THREE: CardType("Three", 3)
+    object FOUR: CardType("Four", 4)
+    object FIVE: CardType("Five", 5)
+    object SIX: CardType("Six", 6)
+    object SEVEN: CardType("Seven", 7)
+    object EIGHT: CardType("Eight", 8)
+    object NINE: CardType("Nine", 9)
+    object TEN: CardType("Ten", 10)
+    object JACK: CardType("Jack", 11)
+    object QUEEN: CardType("Queen", 12)
+    object KING: CardType("King", 13)
+    object ACE: CardType("Ace", 14)
 }
 
 data class Card(val type: CardType, val suit: Suit)
 
-data class Player(val name: String, val hand: List<Card>)
+data class Player(val name: String, val card1: Card, val card2: Card) {
+    val hand = listOf(card1, card2)
+}
