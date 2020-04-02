@@ -1,16 +1,56 @@
 fun decideWinner(river: List<Card>, players: List<Player>): List<Player> {
 
     val playersWithPairs =
-        players.filter { it.hasPair(river) }
-                .map { player -> Pair(player, player.hand.getValueOfPair(river)) }
+        players
+            .filter { it.hasPair(river) }
+            .map { player ->
+                Pair(player, player.hand.getValueOfPair(river))
+            }
 
     if (playersWithPairs.count() > 0) {
-        val highestValue =
-            playersWithPairs.maxBy { (_, value) -> value }!!.let { (_, value) -> value }
-        return playersWithPairs.filter { (_, value) -> value == highestValue }.map { it.first }
+        val highestPairValue = playersWithPairs
+            .maxBy { (_, value) -> value }!!
+            .let { (_, value) -> value }
+
+        val playersWithHighestPairs = playersWithPairs
+            .filter { (_, value) -> value == highestPairValue }
+            .map { (player, _) -> player }
+
+        if (playersWithHighestPairs.size == 1) return playersWithHighestPairs
+
+        val playersAndKickers = playersWithHighestPairs.map { player ->
+            val allCards = river + (player.hand)
+            val allCardsWithPairRemoved = allCards.filter { card -> card.type.value != highestPairValue }
+            val kickers = allCardsWithPairRemoved.sortedBy { card -> card.type.value }.reversed().take(3)
+            Pair(player, kickers)
+        }
+
+        val highestKickerValue = playersWithHighestPairs
+            .flatMap { player ->
+                player.hand.filter { card -> card.type.value != highestPairValue }
+            }.maxBy { card -> card.type.value }!!.let { it.type.value }
+
+        return playersWithHighestPairs.filter { player ->
+            player.hand.map { it.type.value }.contains(highestKickerValue)
+        }
     }
 
     return filterForHighestCard(river, players)
+}
+
+fun foo(playersAndKickers: List<Pair<Player, List<Card>>>): List<Player> {
+    val highestKicker = playersAndKickers.map { (player, kickers) ->
+        val highestKicker = kickers.sortedBy { card -> card.type.value }.reversed().first()
+        highestKicker.type.value
+    }.max()!!
+
+    return playersAndKickers
+        .filter { (_, kickers) ->
+            kickers.map { it.type.value }.contains(highestKicker)
+        }
+        .map { (player, _) ->
+            player
+        }
 }
 
 
@@ -29,8 +69,8 @@ fun List<Card>.getValueOfPair(river: List<Card>): Int {
 
     return this.first { handCard ->
         river.map { riverCard ->
-            riverCard.type.value
-        }
+                riverCard.type.value
+            }
             .contains(handCard.type.value)
     }.type.value
 }

@@ -83,7 +83,7 @@ internal class GameKtTest {
     }
 
     @Test
-    fun `player with pair from river beats high card,`() {
+    fun `player with pair from river beats high card`() {
         val river =
             listOf(Card(TWO, HEARTS), Card(FOUR, CLUBS), Card(FOUR, SPADES), Card(FOUR, DIAMONDS), Card(TEN, HEARTS))
         val player1 = Player("Andy", Card(FIVE, CLUBS), Card(TWO, SPADES))
@@ -94,7 +94,7 @@ internal class GameKtTest {
     }
 
     @Test
-    fun `players with pair, and equivalent kickers from river beats high card,`() {
+    fun `players with pair, and equivalent kickers from river beats high card`() {
         val river =
             listOf(Card(TWO, HEARTS), Card(FOUR, CLUBS), Card(FOUR, SPADES), Card(FOUR, DIAMONDS), Card(TEN, HEARTS))
         val player1 = Player("Andy", Card(FIVE, CLUBS), Card(TWO, SPADES))
@@ -105,7 +105,7 @@ internal class GameKtTest {
     }
 
     @Test
-    fun `player with pair and highest kicker beats  player with same pair and lower kicker,`() {
+    fun `player with pair and highest kicker beats player with same pair and lower kicker`() {
         val river =
             listOf(Card(TWO, HEARTS), Card(FOUR, CLUBS), Card(FOUR, SPADES), Card(FOUR, DIAMONDS), Card(TEN, HEARTS))
         val player1 = Player("Andy", Card(SIX, CLUBS), Card(TWO, SPADES))
@@ -113,5 +113,16 @@ internal class GameKtTest {
         val player3 = Player("Cheryl", Card(FIVE, SPADES), Card(TWO, CLUBS))
 
         assertThat(decideWinner(river, listOf(player1, player2, player3))).isEqualTo(listOf(player1))
+    }
+
+    @Test
+    fun `if two players have the same pair, and all their kickers are from the river, they should both win`() {
+        val river =
+            listOf(Card(TWO, HEARTS), Card(FOUR, CLUBS), Card(NINE, SPADES), Card(TEN, HEARTS), Card(QUEEN, DIAMONDS))
+        val player1 = Player("Andy", Card(SIX, CLUBS), Card(TWO, SPADES))
+        val player2 = Player("Bob", Card(SIX, CLUBS), Card(SEVEN, DIAMONDS))
+        val player3 = Player("Cheryl", Card(FIVE, SPADES), Card(TWO, CLUBS))
+
+        assertThat(decideWinner(river, listOf(player1, player2, player3))).isEqualTo(listOf(player1, player3))
     }
 }
