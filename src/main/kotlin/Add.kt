@@ -1,0 +1,1 @@
+fun add(input1: Int, input2: Int) = input1 + input2
